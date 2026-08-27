@@ -20,9 +20,9 @@ struct ContentView: View {
             Text("Mi primer commit desde Xcode")
                 .font(.subheadline)
                 .foregroundColor(.gray)
-            Text("Versión CON IA - Asistida por Claude")
+            Text("Versión MANUAL - Hecha sin IA")
             .font(.headline)
-            .foregroundColor(.green)
+            .foregroundColor(.blue)
         }
         .padding()
     }
