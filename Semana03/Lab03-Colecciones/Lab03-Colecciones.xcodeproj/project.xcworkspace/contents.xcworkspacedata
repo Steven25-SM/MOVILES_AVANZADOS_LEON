@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:../MetroLima.swift">
+   </FileRef>
+   <FileRef
       location = "group:../PROMPTS.md">
    </FileRef>
    <FileRef
