@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:../PROMPTS.md">
+   </FileRef>
+   <FileRef
+      location = "group:../Ejercicio7-Inventario.swift">
+   </FileRef>
+   <FileRef
+      location = "group:../Ejercicio6-GestionNotas.swift .swift">
+   </FileRef>
+   <FileRef
+      location = "group:../Ejercicio5_Carrito.swift">
+   </FileRef>
+   <FileRef
+      location = "group:../Ejercicio4_Combinacion.swift">
+   </FileRef>
+   <FileRef
+      location = "group:../Ejercicio3_Sets.swift">
+   </FileRef>
+   <FileRef
+      location = "group:../Ejercicio2_Diccionarios.swift">
+   </FileRef>
+   <FileRef
+      location = "group:../Ejercicio1-Arrays.swift">
+   </FileRef>
+   <FileRef
+      location = "self:">
+   </FileRef>
+</Workspace>
