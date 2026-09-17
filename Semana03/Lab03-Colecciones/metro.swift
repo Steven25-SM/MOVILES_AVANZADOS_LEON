@@ -1,19 +1,64 @@
 // Desarrollado por: [Steven Saldaña Melendez]
+
 import Foundation
 
-var lineaUno = ["Villa El Salvador", "Parque Industrial", "Pumacahua", "Villa María",
-                "María Auxiliadora", "San Juan", "Atocongo", "Jorge Chávez", "Ayacucho",
-                "Cabitos", "Angamos", "San Borja Sur", "La Cultura", "Arriola", "Gamarra",
-                "Miguel Grau", "El Ángel", "Presbítero Maestro", "Caja de Agua",
-                "Pirámide del Sol", "Los Jardines", "Los Postes", "San Carlos",
-                "San Martín", "Santa Rosa", "Bayóvar"]
+var lineaUno = [
+    "Villa El Salvador", "Parque Industrial", "Pumacahua", "Villa María",
+    "María Auxiliadora", "San Juan", "Atocongo", "Jorge Chávez", "Ayacucho",
+    "Cabitos", "Angamos", "San Borja Sur", "La Cultura", "Arriola", "Gamarra",
+    "Miguel Grau", "El Ángel", "Presbítero Maestro", "Caja de Agua",
+    "Pirámide del Sol", "Los Jardines", "Los Postes", "San Carlos",
+    "San Martín", "Santa Rosa", "Bayóvar"
+]
 
-var lineaDos = ["Evitamiento", "Óvalo Santa Anita", "Colectora Industrial",
-                "Hermilio Valdizán", "Mercado Santa Anita"]
+// Línea 2 - tramo utilizado por el proyecto original
+var lineaDos = [
+    "Evitamiento", "Óvalo Santa Anita", "Colectora Industrial",
+    "Hermilio Valdizán", "Mercado Santa Anita"
+]
 
+var lineaTres = [
+    "SEAT 1", "El Álamo", "Huandoy", "2 de Octubre", "Villa Sol",
+    "Naranjal", "Carlos Izaguirre", "SEAT 2", "Tomás Valle",
+    "Bartolomé de las Casas", "José Granda", "Caquetá", "Tacna",
+    "Central", "Garcilaso de la Vega", "Jesús María",
+    "Parque de la Reserva", "César Canevaro", "Lince", "Andrés Aramburú",
+    "San Isidro", "Miraflores", "Parque Central de Miraflores",
+    "Parque Reducto", "Panamá", "Huaca Pucllana", "SEAT 3",
+    "Juana Alarco", "Cabitos", "Alejandro Velasco", "Las Gardenias",
+    "SEAT 4", "Los Héroes", "Patio Taller Sur", "Pedro Miotta",
+    "San Juan de Miraflores"
+]
+
+var lineaCuatro = [
+    "Gambetta", "Canta Callao", "Faucett", "Tomás Valle",
+    "Aeropuerto", "La Marina", "Javier Prado Oeste", "Pershing",
+    "Sánchez Carrión", "Salaverry", "Jesús María",
+    "Canevaro", "Pardo de Zela", "Canadá", "Circunvalación",
+    "Javier Prado", "La Molina", "Ate"
+]
+
+var lineaCinco = [
+    "Miraflores", "Reducto", "Barranco", "Armendáriz",
+    "Chorrillos", "Matellini", "Vista Alegre", "Los Cedros",
+    "Huaylas", "Villa El Salvador", "Villa Panamericana", "Pachacámac"
+]
+
+var lineaSeis = [
+    "San Martín de Porres", "Universitaria", "Dueñas",
+    "Colonial", "Venezuela", "San Marcos", "Centro",
+    "Grau", "El Agustino", "San Luis", "La Victoria",
+    "Circunvalación", "Ate", "Santa Anita"
+]
+
+// Tarifas
 var tarifas: [String: (adulto: Double, medio: Double)] = [
     "Línea 1": (adulto: 1.50, medio: 0.75),
-    "Línea 2": (adulto: 1.40, medio: 0.70)
+    "Línea 2": (adulto: 1.40, medio: 0.70),
+    "Línea 3": (adulto: 1.50, medio: 0.75),
+    "Línea 4": (adulto: 1.50, medio: 0.75),
+    "Línea 5": (adulto: 1.50, medio: 0.75),
+    "Línea 6": (adulto: 1.50, medio: 0.75)
 ]
 
 var lineaDeEstacion: [String: String] = [:]
@@ -21,8 +66,11 @@ var conexiones: [String: [String]] = [:]
 var accesibilidad: [String: (ascensor: Bool, rampa: Bool)] = [:]
 var nuevasLineas: [String: [String]] = [:]
 
-func normalizarTexto(_ texto: String) -> String {
+// ============================================================
+// UTILIDADES
+// ============================================================
 
+func normalizarTexto(_ texto: String) -> String {
     return texto
         .trimmingCharacters(in: .whitespacesAndNewlines)
         .folding(
@@ -31,11 +79,7 @@ func normalizarTexto(_ texto: String) -> String {
         )
 }
 
-
-// Busca una estación y devuelve su nombre real,
-// tal como está registrado en el sistema.
 func encontrarEstacion(_ nombre: String) -> String? {
-
     let nombreNormalizado = normalizarTexto(nombre)
 
     return lineaDeEstacion.keys.first {
@@ -43,14 +87,10 @@ func encontrarEstacion(_ nombre: String) -> String? {
     }
 }
 
-
-// Busca la posición de una estación dentro de una línea,
-// ignorando mayúsculas, minúsculas y tildes.
 func indiceEstacion(
     _ nombre: String,
     en estaciones: [String]
 ) -> Int? {
-
     let nombreNormalizado = normalizarTexto(nombre)
 
     return estaciones.firstIndex {
@@ -58,18 +98,21 @@ func indiceEstacion(
     }
 }
 
-
 // ============================================================
 // CONSTRUIR LÍNEAS
 // ============================================================
 
 func construirLinea(_ estaciones: [String], nombreLinea: String) {
+    guard !estaciones.isEmpty else { return }
 
     for i in 0..<estaciones.count {
-
         let estacion = estaciones[i]
 
-        lineaDeEstacion[estacion] = nombreLinea
+        // Si una estación aparece en varias líneas, conservamos
+        // la primera línea registrada para no romper la lógica original.
+        if lineaDeEstacion[estacion] == nil {
+            lineaDeEstacion[estacion] = nombreLinea
+        }
 
         var vecinos: [String] = []
 
@@ -81,7 +124,9 @@ func construirLinea(_ estaciones: [String], nombreLinea: String) {
             vecinos.append(estaciones[i + 1])
         }
 
-        conexiones[estacion] = vecinos
+        conexiones[estacion] = Array(
+            Set((conexiones[estacion] ?? []) + vecinos)
+        )
 
         accesibilidad[estacion] = (
             ascensor: true,
@@ -90,25 +135,24 @@ func construirLinea(_ estaciones: [String], nombreLinea: String) {
     }
 }
 
-
 construirLinea(lineaUno, nombreLinea: "Línea 1")
 construirLinea(lineaDos, nombreLinea: "Línea 2")
-
+construirLinea(lineaTres, nombreLinea: "Línea 3")
+construirLinea(lineaCuatro, nombreLinea: "Línea 4")
+construirLinea(lineaCinco, nombreLinea: "Línea 5")
+construirLinea(lineaSeis, nombreLinea: "Línea 6")
 
 // ============================================================
 // 1. BUSCAR ESTACIÓN
 // ============================================================
 
 func buscarEstacion(_ nombre: String) {
-
     guard let estacionEncontrada = encontrarEstacion(nombre) else {
-
         print("Estación no encontrada.")
         return
     }
 
     guard let linea = lineaDeEstacion[estacionEncontrada] else {
-
         print("Estación no encontrada.")
         return
     }
@@ -121,7 +165,6 @@ func buscarEstacion(_ nombre: String) {
     )
 
     guard let tarifa = tarifas[linea] else {
-
         print("No hay tarifa registrada para esta línea.")
         return
     }
@@ -131,72 +174,72 @@ func buscarEstacion(_ nombre: String) {
     print("Conecta directamente con: \(vecinos)")
     print("Ascensor: \(acc.ascensor ? "Sí" : "No")")
     print("Rampa eléctrica: \(acc.rampa ? "Sí" : "No")")
-    print("Pasaje adulto: S/. \(tarifa.adulto)")
-    print("Medio pasaje: S/. \(tarifa.medio)")
+    print("Pasaje adulto: S/. \(String(format: "%.2f", tarifa.adulto))")
+    print("Medio pasaje: S/. \(String(format: "%.2f", tarifa.medio))")
 
     if let referencias = referenciasEstaciones[estacionEncontrada] {
-
         print("\n===== REFERENCIAS CERCANAS =====")
-
         for referencia in referencias {
             print("- \(referencia)")
         }
-
     } else {
-
         print("\nNo hay referencias registradas para esta estación.")
     }
 }
-
 
 // ============================================================
 // 2. MOSTRAR LÍNEA
 // ============================================================
 
 func mostrarLinea(_ opcion: String) {
+    var nombreLinea = ""
 
-    switch opcion {
-
-    case "1":
-
-        print("\n===== ESTACIONES DE LÍNEA 1 =====")
-
-        for (i, estacion) in lineaUno.enumerated() {
-            print("\(i + 1). \(estacion)")
-        }
-
-    case "2":
-
-        print("\n===== ESTACIONES DE LÍNEA 2 =====")
-
-        for (i, estacion) in lineaDos.enumerated() {
-            print("\(i + 1). \(estacion)")
-        }
-
+    switch normalizarTexto(opcion) {
+    case "1", "linea 1":
+        nombreLinea = "Línea 1"
+    case "2", "linea 2":
+        nombreLinea = "Línea 2"
+    case "3", "linea 3":
+        nombreLinea = "Línea 3"
+    case "4", "linea 4":
+        nombreLinea = "Línea 4"
+    case "5", "linea 5":
+        nombreLinea = "Línea 5"
+    case "6", "linea 6":
+        nombreLinea = "Línea 6"
     default:
+        // También permite escribir directamente el nombre de una línea.
+        nombreLinea = opcion
+    }
 
+    guard let estaciones = obtenerEstacionesDeLinea(nombreLinea) else {
         print("Línea no válida.")
+        return
+    }
+
+    print("\n===== ESTACIONES DE \(nombreLinea.uppercased()) =====")
+
+    for (i, estacion) in estaciones.enumerated() {
+        print("\(i + 1). \(estacion)")
+    }
+
+    if nombreLinea != "Línea 1" && nombreLinea != "Línea 2" {
+        print("\nNota: esta línea se maneja como referencia académica dentro del sistema.")
     }
 }
-
 
 // ============================================================
 // 3. BUSCAR RUTA
 // ============================================================
 
 func buscarRuta(desde origen: String, hasta destino: String) {
-
-    // Buscamos los nombres reales de las estaciones.
-    // Esto permite escribirlas con o sin tildes.
     guard let origenReal = encontrarEstacion(origen),
           let destinoReal = encontrarEstacion(destino) else {
-
         print("Una de las estaciones no existe.")
         return
     }
 
     if origenReal == destinoReal {
-
         print("Ya estás en \(origenReal).")
         return
     }
@@ -205,18 +248,15 @@ func buscarRuta(desde origen: String, hasta destino: String) {
     var cola: [[String]] = [[origenReal]]
 
     while !cola.isEmpty {
-
         let rutaActual = cola.removeFirst()
         let estacionActual = rutaActual.last!
 
         for vecino in conexiones[estacionActual] ?? [] {
-
             if vecino == destinoReal {
-
                 let rutaCompleta = rutaActual + [vecino]
                 let paradas = rutaCompleta.count - 1
 
-                let linea = lineaDeEstacion[origenReal]!
+                let linea = lineaDeEstacion[origenReal] ?? "No identificada"
 
                 print("\n===== RUTA ENCONTRADA =====")
                 print(rutaCompleta.joined(separator: " → "))
@@ -224,16 +264,14 @@ func buscarRuta(desde origen: String, hasta destino: String) {
                 print("Tiempo estimado: \(paradas * 2) min")
 
                 if let tarifa = tarifas[linea] {
-
-                    print("Pasaje adulto: S/. \(tarifa.adulto)")
-                    print("Medio pasaje: S/. \(tarifa.medio)")
+                    print("Pasaje adulto: S/. \(String(format: "%.2f", tarifa.adulto))")
+                    print("Medio pasaje: S/. \(String(format: "%.2f", tarifa.medio))")
                 }
 
                 return
             }
 
             if !visitados.contains(vecino) {
-
                 visitados.insert(vecino)
                 cola.append(rutaActual + [vecino])
             }
@@ -243,50 +281,54 @@ func buscarRuta(desde origen: String, hasta destino: String) {
     print("No se encontró ruta entre \(origenReal) y \(destinoReal).")
 }
 
-
 // ============================================================
 // 4. PLANIFICACIÓN DEL VIAJE
 // ============================================================
 
 func obtenerEstacionesDeLinea(_ nombreLinea: String) -> [String]? {
+    let lineaNormalizada = normalizarTexto(nombreLinea)
 
-    if nombreLinea == "Línea 1" {
+    switch lineaNormalizada {
+    case "linea 1":
         return lineaUno
-    }
-
-    if nombreLinea == "Línea 2" {
+    case "linea 2":
         return lineaDos
+    case "linea 3":
+        return lineaTres
+    case "linea 4":
+        return lineaCuatro
+    case "linea 5":
+        return lineaCinco
+    case "linea 6":
+        return lineaSeis
+    default:
+        return nuevasLineas[nombreLinea]
     }
-
-    return nuevasLineas[nombreLinea]
 }
 
+func lineaDeEstacionPara(_ estacion: String) -> String? {
+    return lineaDeEstacion[estacion]
+}
 
 func planificarViaje(desde origen: String, hasta destino: String) {
-
-    // Obtenemos los nombres reales registrados.
     guard let origenReal = encontrarEstacion(origen),
           let destinoReal = encontrarEstacion(destino) else {
-
         print("Una de las estaciones no existe.")
         return
     }
 
-    guard let lineaOrigen = lineaDeEstacion[origenReal],
-          let lineaDestino = lineaDeEstacion[destinoReal] else {
-
+    guard let lineaOrigen = lineaDeEstacionPara(origenReal),
+          let lineaDestino = lineaDeEstacionPara(destinoReal) else {
         print("No se pudo identificar la línea de una de las estaciones.")
         return
     }
 
     if origenReal == destinoReal {
-
         print("Ya estás en \(origenReal).")
         return
     }
 
     if lineaOrigen == lineaDestino {
-
         guard let estaciones = obtenerEstacionesDeLinea(lineaOrigen),
               let posicionOrigen = indiceEstacion(
                 origenReal,
@@ -296,7 +338,6 @@ func planificarViaje(desde origen: String, hasta destino: String) {
                 destinoReal,
                 en: estaciones
               ) else {
-
             print("No se pudo calcular la planificación.")
             return
         }
@@ -311,9 +352,7 @@ func planificarViaje(desde origen: String, hasta destino: String) {
         print("Línea: \(lineaOrigen)")
         print("Estaciones que faltan: \(estacionesFaltantes)")
         print("Tiempo aproximado: \(estacionesFaltantes * 2) minutos")
-
     } else {
-
         let estacionesOrigen =
             obtenerEstacionesDeLinea(lineaOrigen) ?? []
 
@@ -321,7 +360,10 @@ func planificarViaje(desde origen: String, hasta destino: String) {
             obtenerEstacionesDeLinea(lineaDestino) ?? []
 
         let estacionesComunes = estacionesOrigen.filter {
-            estacionesDestino.contains($0)
+            estacion in
+            estacionesDestino.contains {
+                normalizarTexto($0) == normalizarTexto(estacion)
+            }
         }
 
         print("\n===== PLANIFICACIÓN DEL VIAJE =====")
@@ -331,16 +373,9 @@ func planificarViaje(desde origen: String, hasta destino: String) {
         print("Línea de destino: \(lineaDestino)")
 
         if estacionesComunes.isEmpty {
-
-            print(
-                "No existen estaciones de interconexión " +
-                "registradas entre ambas líneas."
-            )
-
+            print("No existen estaciones de interconexión registradas entre ambas líneas.")
         } else {
-
             print("Estaciones de interconexión:")
-
             for estacion in estacionesComunes {
                 print("- \(estacion)")
             }
@@ -348,18 +383,14 @@ func planificarViaje(desde origen: String, hasta destino: String) {
     }
 }
 
-
 // ============================================================
 // 5. TARJETA DE TRANSPORTE
 // ============================================================
 
 var saldoTarjeta: Double = 10.00
 
-
 func consultarSaldo() {
-
     print("\n===== SALDO DE TARJETA =====")
-
     print(
         String(
             format: "Saldo actual: S/. %.2f",
@@ -368,11 +399,8 @@ func consultarSaldo() {
     )
 }
 
-
 func recargarTarjeta(_ monto: Double) {
-
     if monto <= 0 {
-
         print("El monto de recarga debe ser mayor que 0.")
         return
     }
@@ -380,7 +408,6 @@ func recargarTarjeta(_ monto: Double) {
     saldoTarjeta += monto
 
     print("\n===== RECARGA REALIZADA =====")
-
     print(
         String(
             format: "Monto recargado: S/. %.2f",
@@ -396,22 +423,17 @@ func recargarTarjeta(_ monto: Double) {
     )
 }
 
-
 func pagarPasaje(linea: String, tipoPasajero: String) {
-
-    // También normalizamos el nombre de la línea.
     let lineaNormalizada = normalizarTexto(linea)
 
     guard let lineaReal = tarifas.keys.first(where: {
         normalizarTexto($0) == lineaNormalizada
     }) else {
-
         print("La línea no tiene una tarifa registrada.")
         return
     }
 
     guard let tarifa = tarifas[lineaReal] else {
-
         print("La línea no tiene una tarifa registrada.")
         return
     }
@@ -421,24 +443,19 @@ func pagarPasaje(linea: String, tipoPasajero: String) {
     let precio: Double
 
     switch tipoNormalizado {
-
     case "adulto":
-
         precio = tarifa.adulto
 
     case "medio":
-
         precio = tarifa.medio
 
     default:
-
         print("Tipo de pasajero no válido.")
         print("Use: adulto o medio.")
         return
     }
 
     if saldoTarjeta < precio {
-
         print("\nSaldo insuficiente.")
 
         print(
@@ -479,169 +496,234 @@ func pagarPasaje(linea: String, tipoPasajero: String) {
     )
 }
 
-
 // ============================================================
 // 6. REFERENCIAS CERCANAS
 // ============================================================
 
 var referenciasEstaciones: [String: [String]] = [
-
     "Villa El Salvador": [
         "Cerca al Parque Zonal Huáscar",
         "Cerca a la Municipalidad de Villa El Salvador"
     ],
-
     "Parque Industrial": [
         "Cerca a la zona industrial de Villa El Salvador",
         "Cerca a la Av. El Sol"
     ],
-
     "Pumacahua": [
         "Cerca a la Av. Pachacútec",
         "Cerca a la zona comercial de Villa María"
     ],
-
     "Villa María": [
         "Cerca a la Plaza de Villa María",
         "Cerca al Mercado de Villa María"
     ],
-
     "María Auxiliadora": [
         "Cerca al Hospital María Auxiliadora",
         "Cerca a la Av. Miguel Iglesias"
     ],
-
     "San Juan": [
         "Cerca a la Municipalidad de San Juan de Miraflores",
         "Cerca a la zona comercial de San Juan"
     ],
-
     "Atocongo": [
         "Cerca al Mall del Sur",
         "Cerca al Puente Atocongo"
     ],
-
     "Jorge Chávez": [
         "Cerca a la Av. Jorge Chávez",
-        "Cerca a la zona residencial de Surco"
+        "Zona residencial cercana"
     ],
-
     "Ayacucho": [
         "Cerca a la Av. Ayacucho",
         "Cerca a la zona comercial de Surco"
     ],
-
     "Cabitos": [
         "Cerca al Óvalo Higuereta",
         "Cerca a la Av. Aviación"
     ],
-
     "Angamos": [
         "Cerca a la Av. Angamos",
         "Cerca al cruce de Angamos con Aviación"
     ],
-
     "San Borja Sur": [
         "Cerca a la Av. San Borja Sur",
         "Cerca al distrito de San Borja"
     ],
-
     "La Cultura": [
         "Cerca al Gran Teatro Nacional",
         "Cerca a la Biblioteca Nacional del Perú"
     ],
-
     "Arriola": [
         "Cerca a la Av. Nicolás Arriola",
         "Cerca al Mercado de Frutas"
     ],
-
     "Gamarra": [
         "Cerca al Emporio Comercial de Gamarra",
         "Cerca a la Av. Aviación"
     ],
-
     "Miguel Grau": [
         "Cerca a la Av. Miguel Grau",
         "Cerca al Hospital Nacional Dos de Mayo"
     ],
-
     "El Ángel": [
         "Cerca al Cementerio El Ángel",
         "Cerca a la Av. Ancash"
     ],
-
     "Presbítero Maestro": [
         "Cerca al Cementerio Presbítero Maestro",
         "Cerca a la Av. Ancash"
     ],
-
     "Caja de Agua": [
         "Cerca a la Av. Próceres de la Independencia",
         "Cerca a la zona de Caja de Agua"
     ],
-
     "Pirámide del Sol": [
         "Cerca a la Av. Próceres de la Independencia",
         "Cerca a la zona de Zárate"
     ],
-
     "Los Jardines": [
         "Cerca a la Av. Los Jardines",
         "Cerca a la zona comercial de San Juan de Lurigancho"
     ],
-
     "Los Postes": [
         "Cerca a la Av. Los Postes",
         "Cerca a la zona comercial de San Juan de Lurigancho"
     ],
-
     "San Carlos": [
         "Cerca a la Universidad Nacional Mayor de San Marcos",
         "Cerca a la Av. Próceres de la Independencia"
     ],
-
     "San Martín": [
         "Cerca a la zona de San Martín de Porres",
         "Cerca a la Av. Próceres de la Independencia"
     ],
-
     "Santa Rosa": [
         "Cerca a la zona residencial de Santa Rosa",
         "Cerca a la Av. Próceres de la Independencia"
     ],
-
     "Bayóvar": [
         "Cerca a la Av. Fernando Wiesse",
         "Cerca a la zona comercial de San Juan de Lurigancho"
     ],
-
     "Evitamiento": [
         "Cerca a la Vía de Evitamiento",
         "Cerca al intercambio vial de Evitamiento"
     ],
-
     "Óvalo Santa Anita": [
         "Cerca al Óvalo Santa Anita",
         "Cerca al Mercado de Productores de Santa Anita"
     ],
-
     "Colectora Industrial": [
         "Cerca a la zona industrial de Santa Anita",
         "Cerca a la Av. Colectora Industrial"
     ],
-
     "Hermilio Valdizán": [
         "Cerca a la Av. Hermilio Valdizán",
         "Cerca a la zona comercial de Santa Anita"
     ],
-
     "Mercado Santa Anita": [
         "Cerca al Mercado Mayorista de Lima",
         "Cerca a la Av. La Cultura"
+    ],
+
+    // Referencias adicionales para las nuevas líneas
+    "Naranjal": [
+        "Zona norte de Lima",
+        "Cerca a la Av. Túpac Amaru"
+    ],
+    "Carlos Izaguirre": [
+        "Cerca a la Av. Carlos Izaguirre",
+        "Zona comercial de Los Olivos"
+    ],
+    "Tomás Valle": [
+        "Cerca a la Av. Tomás Valle",
+        "Zona comercial del norte de Lima"
+    ],
+    "Caquetá": [
+        "Cerca a la Av. Caquetá",
+        "Zona del Rímac"
+    ],
+    "Tacna": [
+        "Cerca a la Av. Tacna",
+        "Centro de Lima"
+    ],
+    "Central": [
+        "Zona central de Lima",
+        "Cerca a vías principales del centro"
+    ],
+    "Jesús María": [
+        "Zona residencial y comercial de Jesús María",
+        "Cerca a la Av. Brasil y vías principales"
+    ],
+    "Lince": [
+        "Zona comercial de Lince",
+        "Cerca a la Av. Arequipa"
+    ],
+    "San Isidro": [
+        "Zona empresarial de San Isidro",
+        "Cerca a la Av. Arequipa"
+    ],
+    "Miraflores": [
+        "Zona comercial de Miraflores",
+        "Cerca a vías principales del distrito"
+    ],
+    "Huaca Pucllana": [
+        "Cerca a la Huaca Pucllana",
+        "Zona turística de Miraflores"
+    ],
+    "Los Héroes": [
+        "Zona sur de Lima",
+        "Cerca a San Juan de Miraflores"
+    ],
+    "Faucett": [
+        "Cerca a la Av. Elmer Faucett",
+        "Zona del Callao"
+    ],
+    "La Marina": [
+        "Cerca a la Av. La Marina",
+        "Conexión hacia San Miguel"
+    ],
+    "Javier Prado": [
+        "Cerca a la Av. Javier Prado",
+        "Zona empresarial y comercial"
+    ],
+    "La Molina": [
+        "Zona de La Molina",
+        "Cerca a la Av. Javier Prado"
+    ],
+    "Ate": [
+        "Zona de Ate",
+        "Cerca a vías principales de Lima Este"
+    ],
+    "Barranco": [
+        "Zona turística de Barranco",
+        "Cerca a la Av. Bolognesi"
+    ],
+    "Chorrillos": [
+        "Zona de Chorrillos",
+        "Cerca a vías principales del distrito"
+    ],
+    "Villa Panamericana": [
+        "Cerca a Villa Panamericana",
+        "Zona sur de Lima"
+    ],
+    "Pachacámac": [
+        "Zona de Pachacámac",
+        "Conexión hacia Lima Sur"
+    ],
+    "San Martín de Porres": [
+        "Zona de San Martín de Porres",
+        "Cerca a vías principales de Lima Norte"
+    ],
+    "El Agustino": [
+        "Zona de El Agustino",
+        "Cerca a vías principales de Lima Este"
+    ],
+    "San Luis": [
+        "Zona de San Luis",
+        "Cerca a la Av. Canadá"
     ]
 ]
-
 
 // ============================================================
 // 7. FUNCIONES DEL ADMINISTRADOR
@@ -651,12 +733,14 @@ func construirConexionesLinea(
     _ estaciones: [String],
     nombreLinea: String
 ) {
+    guard !estaciones.isEmpty else { return }
 
     for i in 0..<estaciones.count {
-
         let estacion = estaciones[i]
 
-        lineaDeEstacion[estacion] = nombreLinea
+        if lineaDeEstacion[estacion] == nil {
+            lineaDeEstacion[estacion] = nombreLinea
+        }
 
         var vecinos: [String] = []
 
@@ -668,10 +752,11 @@ func construirConexionesLinea(
             vecinos.append(estaciones[i + 1])
         }
 
-        conexiones[estacion] = vecinos
+        conexiones[estacion] = Array(
+            Set((conexiones[estacion] ?? []) + vecinos)
+        )
 
         if accesibilidad[estacion] == nil {
-
             accesibilidad[estacion] = (
                 ascensor: true,
                 rampa: true
@@ -680,34 +765,28 @@ func construirConexionesLinea(
     }
 }
 
-
 func agregarEstacionFinal(
     nombre: String,
     linea: String
 ) {
-
     let nombreLimpio = nombre.trimmingCharacters(
         in: .whitespacesAndNewlines
     )
 
     guard !nombreLimpio.isEmpty else {
-
         print("El nombre de la estación no puede estar vacío.")
         return
     }
 
-    // Evita duplicados aunque se escriban sin tildes
-    // o con diferentes mayúsculas.
     if encontrarEstacion(nombreLimpio) != nil {
-
         print("La estación ya existe.")
         return
     }
 
-    switch linea {
+    let lineaNormalizada = normalizarTexto(linea)
 
-    case "Línea 1":
-
+    switch lineaNormalizada {
+    case "linea 1":
         lineaUno.append(nombreLimpio)
 
         construirConexionesLinea(
@@ -717,8 +796,7 @@ func agregarEstacionFinal(
 
         print("Estación agregada correctamente a Línea 1.")
 
-    case "Línea 2":
-
+    case "linea 2":
         lineaDos.append(nombreLimpio)
 
         construirConexionesLinea(
@@ -728,10 +806,48 @@ func agregarEstacionFinal(
 
         print("Estación agregada correctamente a Línea 2.")
 
+    case "linea 3":
+        lineaTres.append(nombreLimpio)
+
+        construirConexionesLinea(
+            lineaTres,
+            nombreLinea: "Línea 3"
+        )
+
+        print("Estación agregada correctamente a Línea 3.")
+
+    case "linea 4":
+        lineaCuatro.append(nombreLimpio)
+
+        construirConexionesLinea(
+            lineaCuatro,
+            nombreLinea: "Línea 4"
+        )
+
+        print("Estación agregada correctamente a Línea 4.")
+
+    case "linea 5":
+        lineaCinco.append(nombreLimpio)
+
+        construirConexionesLinea(
+            lineaCinco,
+            nombreLinea: "Línea 5"
+        )
+
+        print("Estación agregada correctamente a Línea 5.")
+
+    case "linea 6":
+        lineaSeis.append(nombreLimpio)
+
+        construirConexionesLinea(
+            lineaSeis,
+            nombreLinea: "Línea 6"
+        )
+
+        print("Estación agregada correctamente a Línea 6.")
+
     default:
-
         guard nuevasLineas[linea] != nil else {
-
             print("Línea no válida.")
             return
         }
@@ -743,12 +859,9 @@ func agregarEstacionFinal(
             nombreLinea: linea
         )
 
-        print(
-            "Estación agregada correctamente a \(linea)."
-        )
+        print("Estación agregada correctamente a \(linea).")
     }
 }
-
 
 func insertarEstacion(
     nombre: String,
@@ -756,45 +869,38 @@ func insertarEstacion(
     y estacionB: String,
     linea: String
 ) {
-
     let nombreLimpio = nombre.trimmingCharacters(
         in: .whitespacesAndNewlines
     )
 
     guard !nombreLimpio.isEmpty else {
-
         print("El nombre de la estación no puede estar vacío.")
         return
     }
 
     if encontrarEstacion(nombreLimpio) != nil {
-
         print("La estación ya existe.")
         return
     }
 
     guard var estaciones = obtenerEstacionesDeLinea(linea) else {
-
         print("La línea no existe.")
         return
     }
 
-    // Buscar las estaciones ignorando tildes y mayúsculas.
     guard let indiceA = indiceEstacion(
-              estacionA,
-              en: estaciones
-          ),
-          let indiceB = indiceEstacion(
-              estacionB,
-              en: estaciones
-          ) else {
-
+        estacionA,
+        en: estaciones
+    ),
+    let indiceB = indiceEstacion(
+        estacionB,
+        en: estaciones
+    ) else {
         print("Una de las estaciones no existe en esa línea.")
         return
     }
 
     guard abs(indiceA - indiceB) == 1 else {
-
         print("Las estaciones deben ser consecutivas.")
         return
     }
@@ -806,16 +912,28 @@ func insertarEstacion(
         at: posicion
     )
 
-    if linea == "Línea 1" {
+    let lineaNormalizada = normalizarTexto(linea)
 
+    switch lineaNormalizada {
+    case "linea 1":
         lineaUno = estaciones
 
-    } else if linea == "Línea 2" {
-
+    case "linea 2":
         lineaDos = estaciones
 
-    } else {
+    case "linea 3":
+        lineaTres = estaciones
 
+    case "linea 4":
+        lineaCuatro = estaciones
+
+    case "linea 5":
+        lineaCinco = estaciones
+
+    case "linea 6":
+        lineaSeis = estaciones
+
+    default:
         nuevasLineas[linea] = estaciones
     }
 
@@ -829,44 +947,41 @@ func insertarEstacion(
     )
 }
 
-
 func crearNuevaLinea(
     nombreLinea: String,
     estaciones: [String]
 ) {
-
     let nombreLineaLimpio = nombreLinea.trimmingCharacters(
         in: .whitespacesAndNewlines
     )
 
     if nombreLineaLimpio.isEmpty {
-
         print("El nombre de la línea no puede estar vacío.")
         return
     }
 
-    if nombreLineaLimpio == "Línea 1" ||
-       nombreLineaLimpio == "Línea 2" ||
-       nuevasLineas[nombreLineaLimpio] != nil {
+    let nombreNormalizado = normalizarTexto(nombreLineaLimpio)
+
+    if [
+        "linea 1", "linea 2", "linea 3",
+        "linea 4", "linea 5", "linea 6"
+    ].contains(nombreNormalizado) ||
+        nuevasLineas[nombreLineaLimpio] != nil {
 
         print("La línea ya existe.")
         return
     }
 
     if estaciones.isEmpty {
-
         print("La línea debe tener al menos una estación.")
         return
     }
 
     for estacion in estaciones {
-
         if encontrarEstacion(estacion) != nil {
-
             print(
                 "La estación \(estacion) ya pertenece a otra línea."
             )
-
             return
         }
     }
@@ -888,22 +1003,18 @@ func crearNuevaLinea(
     print("Estaciones:")
 
     for (i, estacion) in estaciones.enumerated() {
-
         print("\(i + 1). \(estacion)")
     }
 }
-
 
 // ============================================================
 // 8. MODO ADMINISTRADOR
 // ============================================================
 
 func modoAdministrador() {
-
     var continuarAdmin = true
 
     while continuarAdmin {
-
         print("\n===== MODO ADMINISTRADOR =====")
         print("1) Agregar estación al final de una línea")
         print("2) Insertar estación entre dos estaciones")
@@ -914,73 +1025,48 @@ func modoAdministrador() {
         let opcion = readLine() ?? ""
 
         switch opcion {
-
         case "1":
-
             print("Nombre de la nueva estación:")
-
             let nombre = readLine() ?? ""
 
             print("¿A qué línea pertenece?")
             print("1) Línea 1")
             print("2) Línea 2")
+            print("3) Línea 3")
+            print("4) Línea 4")
+            print("5) Línea 5")
+            print("6) Línea 6")
             print("También puede escribir el nombre de una línea nueva.")
 
             let opcionLinea = readLine() ?? ""
+            let nombreLinea = resolverNombreLinea(opcionLinea)
 
-            if opcionLinea == "1" {
-
-                agregarEstacionFinal(
-                    nombre: nombre,
-                    linea: "Línea 1"
-                )
-
-            } else if opcionLinea == "2" {
-
-                agregarEstacionFinal(
-                    nombre: nombre,
-                    linea: "Línea 2"
-                )
-
-            } else {
-
-                agregarEstacionFinal(
-                    nombre: nombre,
-                    linea: opcionLinea
-                )
-            }
-
+            agregarEstacionFinal(
+                nombre: nombre,
+                linea: nombreLinea
+            )
 
         case "2":
-
             print("Nombre de la nueva estación:")
-
             let nombre = readLine() ?? ""
 
             print("Primera estación:")
-
             let estacionA = readLine() ?? ""
 
             print("Segunda estación:")
-
             let estacionB = readLine() ?? ""
 
             print("¿En qué línea?")
             print("1) Línea 1")
             print("2) Línea 2")
+            print("3) Línea 3")
+            print("4) Línea 4")
+            print("5) Línea 5")
+            print("6) Línea 6")
             print("También puede escribir el nombre de una línea nueva.")
 
             let opcionLinea = readLine() ?? ""
-
-            var nombreLinea = opcionLinea
-
-            if opcionLinea == "1" {
-                nombreLinea = "Línea 1"
-            }
-
-            if opcionLinea == "2" {
-                nombreLinea = "Línea 2"
-            }
+            let nombreLinea = resolverNombreLinea(opcionLinea)
 
             insertarEstacion(
                 nombre: nombre,
@@ -989,20 +1075,15 @@ func modoAdministrador() {
                 linea: nombreLinea
             )
 
-
         case "3":
-
             print("Nombre de la nueva línea:")
-
             let nombreLinea = readLine() ?? ""
 
             print("¿Cuántas estaciones tendrá?")
-
             let cantidadTexto = readLine() ?? ""
 
             guard let cantidad = Int(cantidadTexto),
                   cantidad > 0 else {
-
                 print("Cantidad no válida.")
                 continue
             }
@@ -1010,13 +1091,10 @@ func modoAdministrador() {
             var estaciones: [String] = []
 
             for i in 1...cantidad {
-
                 print("Nombre de la estación \(i):")
-
                 let estacion = readLine() ?? ""
 
                 if !estacion.isEmpty {
-
                     estaciones.append(estacion)
                 }
             }
@@ -1026,20 +1104,119 @@ func modoAdministrador() {
                 estaciones: estaciones
             )
 
-
         case "4":
-
             print("Saliendo del modo administrador...")
             continuarAdmin = false
 
-
         default:
-
             print("Opción no válida.")
         }
     }
 }
 
+// ============================================================
+// FUNCIONES AUXILIARES DEL MENÚ
+// ============================================================
+
+func mostrarOpcionesLineas() {
+    print("1) Línea 1")
+    print("2) Línea 2")
+    print("3) Línea 3")
+    print("4) Línea 4")
+    print("5) Línea 5")
+    print("6) Línea 6")
+
+    if !nuevasLineas.isEmpty {
+        print("También puede escribir el nombre de una línea creada por el administrador.")
+    }
+}
+
+func resolverNombreLinea(_ opcion: String) -> String {
+    let valor = opcion.trimmingCharacters(
+        in: .whitespacesAndNewlines
+    )
+
+    switch normalizarTexto(valor) {
+    case "1", "linea 1":
+        return "Línea 1"
+
+    case "2", "linea 2":
+        return "Línea 2"
+
+    case "3", "linea 3":
+        return "Línea 3"
+
+    case "4", "linea 4":
+        return "Línea 4"
+
+    case "5", "linea 5":
+        return "Línea 5"
+
+    case "6", "linea 6":
+        return "Línea 6"
+
+    default:
+        return valor
+    }
+}
+
+// ============================================================
+// ============================================================
+// MENÚ DE TARJETA
+// ============================================================
+
+func menuTarjeta() {
+    var continuarTarjeta = true
+
+    while continuarTarjeta {
+        print("\n===== TARJETA DE TRANSPORTE =====")
+        print("1) Consultar saldo")
+        print("2) Recargar saldo")
+        print("3) Pagar pasaje")
+        print("4) Volver")
+        print("Seleccione una opción:")
+
+        let opcionTarjeta = readLine() ?? ""
+
+        switch opcionTarjeta {
+        case "1":
+            consultarSaldo()
+
+        case "2":
+            print("Monto a recargar:")
+            let montoTexto = readLine() ?? ""
+
+            if let monto = Double(montoTexto) {
+                recargarTarjeta(monto)
+            } else {
+                print("Monto no válido.")
+            }
+
+        case "3":
+            print("Línea:")
+            mostrarOpcionesLineas()
+
+            let linea = readLine() ?? ""
+            let nombreLinea = resolverNombreLinea(linea)
+
+            print("Tipo de pasajero:")
+            print("adulto / medio")
+
+            let tipo = readLine() ?? ""
+
+            pagarPasaje(
+                linea: nombreLinea,
+                tipoPasajero: tipo
+            )
+
+        case "4":
+            continuarTarjeta = false
+
+        default:
+            print("Opción no válida.")
+        }
+    }
+}
 
 // ============================================================
 // MENÚ PRINCIPAL
@@ -1048,7 +1225,6 @@ func modoAdministrador() {
 var continuar = true
 
 while continuar {
-
     print("\n===== SISTEMA DE CONSULTAS - METRO DE LIMA =====")
     print("1) Buscar estación")
     print("2) Ver estaciones de una línea")
@@ -1068,7 +1244,6 @@ while continuar {
     switch opcion {
 
     case "1":
-
         print("Nombre de la estación:")
 
         let estacion = readLine()?
@@ -1078,10 +1253,9 @@ while continuar {
 
         buscarEstacion(estacion)
 
-
     case "2":
-
-        print("¿Qué línea? (1 o 2)")
+        print("¿Qué línea desea consultar?")
+        mostrarOpcionesLineas()
 
         let linea = readLine()?
             .trimmingCharacters(
@@ -1090,18 +1264,14 @@ while continuar {
 
         mostrarLinea(linea)
 
-
     case "3":
-
         print("Estación de origen:")
-
         let origen = readLine()?
             .trimmingCharacters(
                 in: .whitespacesAndNewlines
             ) ?? ""
 
         print("Estación de destino:")
-
         let destino = readLine()?
             .trimmingCharacters(
                 in: .whitespacesAndNewlines
@@ -1112,33 +1282,28 @@ while continuar {
             hasta: destino
         )
 
-
     case "4":
-
         print("\n===== TARIFAS =====")
 
-        for (linea, tarifa) in tarifas {
-
+        for (linea, tarifa) in tarifas.sorted(by: {
+            normalizarTexto($0.key) < normalizarTexto($1.key)
+        }) {
             print(
-                "\(linea): Adulto S/. \(tarifa.adulto) | " +
-                "Medio pasaje S/. \(tarifa.medio)"
+                "\(linea): Adulto S/. \(String(format: "%.2f", tarifa.adulto)) | " +
+                "Medio pasaje S/. \(String(format: "%.2f", tarifa.medio))"
             )
         }
 
-
     case "5":
-
         print("\n===== PLANIFICACIÓN DEL VIAJE =====")
 
         print("Estación de origen:")
-
         let origen = readLine()?
             .trimmingCharacters(
                 in: .whitespacesAndNewlines
             ) ?? ""
 
         print("Estación de destino:")
-
         let destino = readLine()?
             .trimmingCharacters(
                 in: .whitespacesAndNewlines
@@ -1149,104 +1314,17 @@ while continuar {
             hasta: destino
         )
 
-
     case "6":
-
-        var continuarTarjeta = true
-
-        while continuarTarjeta {
-
-            print("\n===== TARJETA DE TRANSPORTE =====")
-            print("1) Consultar saldo")
-            print("2) Recargar saldo")
-            print("3) Pagar pasaje")
-            print("4) Volver")
-            print("Seleccione una opción:")
-
-            let opcionTarjeta = readLine() ?? ""
-
-            switch opcionTarjeta {
-
-            case "1":
-
-                consultarSaldo()
-
-
-            case "2":
-
-                print("Monto a recargar:")
-
-                let montoTexto = readLine() ?? ""
-
-                if let monto = Double(montoTexto) {
-
-                    recargarTarjeta(monto)
-
-                } else {
-
-                    print("Monto no válido.")
-                }
-
-
-            case "3":
-
-                print("Línea:")
-                print("1) Línea 1")
-                print("2) Línea 2")
-
-                let linea = readLine() ?? ""
-
-                var nombreLinea = ""
-
-                if linea == "1" {
-
-                    nombreLinea = "Línea 1"
-
-                } else if linea == "2" {
-
-                    nombreLinea = "Línea 2"
-
-                } else {
-
-                    nombreLinea = linea
-                }
-
-                print("Tipo de pasajero:")
-                print("adulto / medio")
-
-                let tipo = readLine() ?? ""
-
-                pagarPasaje(
-                    linea: nombreLinea,
-                    tipoPasajero: tipo
-                )
-
-
-            case "4":
-
-                continuarTarjeta = false
-
-
-            default:
-
-                print("Opción no válida.")
-            }
-        }
-
+        menuTarjeta()
 
     case "7":
-
         modoAdministrador()
 
-
     case "8":
-
         print("Saliendo...")
         continuar = false
 
-
     default:
-
         print("Opción no válida.")
     }
 }
