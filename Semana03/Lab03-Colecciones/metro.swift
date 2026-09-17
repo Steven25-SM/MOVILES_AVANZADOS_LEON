@@ -11,7 +11,6 @@ var lineaUno = [
     "San Martín", "Santa Rosa", "Bayóvar"
 ]
 
-// Línea 2 - tramo utilizado por el proyecto original
 var lineaDos = [
     "Evitamiento", "Óvalo Santa Anita", "Colectora Industrial",
     "Hermilio Valdizán", "Mercado Santa Anita"
@@ -1008,10 +1007,39 @@ func crearNuevaLinea(
 }
 
 // ============================================================
+// AUTENTICACIÓN DEL ADMINISTRADOR
+// ============================================================
+
+func autenticarAdministrador() -> Bool {
+    print("\n===== ACCESO ADMINISTRADOR =====")
+
+    print("Usuario:")
+    let usuario = readLine()?
+        .trimmingCharacters(
+            in: .whitespacesAndNewlines
+        ) ?? ""
+
+    print("Password:")
+    let password = readLine() ?? ""
+
+    if usuario == "steven" && password == "tecsup00" {
+        print("\nAcceso concedido. Bienvenido, \(usuario).")
+        return true
+    }
+
+    print("\nUsuario o password incorrectos.")
+    return false
+}
+
+// ============================================================
 // 8. MODO ADMINISTRADOR
 // ============================================================
 
 func modoAdministrador() {
+    guard autenticarAdministrador() else {
+        return
+    }
+
     var continuarAdmin = true
 
     while continuarAdmin {
@@ -1030,13 +1058,7 @@ func modoAdministrador() {
             let nombre = readLine() ?? ""
 
             print("¿A qué línea pertenece?")
-            print("1) Línea 1")
-            print("2) Línea 2")
-            print("3) Línea 3")
-            print("4) Línea 4")
-            print("5) Línea 5")
-            print("6) Línea 6")
-            print("También puede escribir el nombre de una línea nueva.")
+            mostrarOpcionesLineas()
 
             let opcionLinea = readLine() ?? ""
             let nombreLinea = resolverNombreLinea(opcionLinea)
@@ -1057,13 +1079,7 @@ func modoAdministrador() {
             let estacionB = readLine() ?? ""
 
             print("¿En qué línea?")
-            print("1) Línea 1")
-            print("2) Línea 2")
-            print("3) Línea 3")
-            print("4) Línea 4")
-            print("5) Línea 5")
-            print("6) Línea 6")
-            print("También puede escribir el nombre de una línea nueva.")
+            mostrarOpcionesLineas()
 
             let opcionLinea = readLine() ?? ""
             let nombreLinea = resolverNombreLinea(opcionLinea)
@@ -1094,9 +1110,16 @@ func modoAdministrador() {
                 print("Nombre de la estación \(i):")
                 let estacion = readLine() ?? ""
 
-                if !estacion.isEmpty {
+                if !estacion.trimmingCharacters(
+                    in: .whitespacesAndNewlines
+                ).isEmpty {
                     estaciones.append(estacion)
                 }
+            }
+
+            if estaciones.count != cantidad {
+                print("No se pudo crear la línea porque faltan estaciones.")
+                continue
             }
 
             crearNuevaLinea(
@@ -1160,7 +1183,6 @@ func resolverNombreLinea(_ opcion: String) -> String {
     }
 }
 
-// ============================================================
 // ============================================================
 // MENÚ DE TARJETA
 // ============================================================
